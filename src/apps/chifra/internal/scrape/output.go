@@ -10,6 +10,7 @@ package scrapePkg
 
 // EXISTING_CODE
 import (
+	"fmt"
 	"net/http"
 	"sync"
 
@@ -32,6 +33,10 @@ func RunScrape(cmd *cobra.Command, args []string) error {
 	if opts.Blaze {
 		tsArray := make([]uint64, opts.BlockCnt)
 		opts.ScrapeBlocks(tsArray)
+		for _, ts := range tsArray {
+			fmt.Println(ts)
+		}
+
 	} else {
 		var wg sync.WaitGroup
 
