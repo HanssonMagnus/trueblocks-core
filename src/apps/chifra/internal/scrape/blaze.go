@@ -23,7 +23,7 @@ type ScrapedData struct {
 	logs   rpcClient.Log
 }
 
-func (opts *ScrapeOptions) ScrapeBlocks(tsArray []uint64) {
+func (opts *ScrapeOptions) ScrapeBlocks() {
 	rpcProvider := config.GetRpcProvider(opts.Globals.Chain)
 
 	blockChannel := make(chan int)
@@ -32,7 +32,7 @@ func (opts *ScrapeOptions) ScrapeBlocks(tsArray []uint64) {
 	var blockWG sync.WaitGroup
 	blockWG.Add(int(opts.BlockChanCnt))
 	for i := 0; i < int(opts.BlockChanCnt); i++ {
-		go opts.processBlocks(rpcProvider, tsArray, blockChannel, addressChannel, &blockWG)
+		go opts.processBlocks(rpcProvider, blockChannel, addressChannel, &blockWG)
 	}
 
 	var addressWG sync.WaitGroup
@@ -53,10 +53,8 @@ func (opts *ScrapeOptions) ScrapeBlocks(tsArray []uint64) {
 }
 
 // processBlocks Process the block channel and for each block query the node for both traces and logs. Send results to addressChannel
-func (opts *ScrapeOptions) processBlocks(rpcProvider string, tsArray []uint64, blockChannel chan int, addressChannel chan ScrapedData, blockWG *sync.WaitGroup) {
+func (opts *ScrapeOptions) processBlocks(rpcProvider string, blockChannel chan int, addressChannel chan ScrapedData, blockWG *sync.WaitGroup) {
 	for blockNum := range blockChannel {
-
-		tsArray = append(tsArray, rpcClient.GetBlockTimestamp(rpcProvider, uint64(blockNum)))
 
 		var traces rpcClient.Trace
 		tracePl := rpcClient.RPCPayload{"2.0", "trace_block", rpcClient.RPCParams{fmt.Sprintf("0x%x", blockNum)}, 1002}
