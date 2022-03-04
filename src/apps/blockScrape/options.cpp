@@ -146,15 +146,18 @@ bool COptions::parseArguments(string_q& command) {
         // Each chain must have it's own prefund addresses. Here, we scan the prefund list
         // and add a psuedo-transaction (block: 0, txid: order-in-file) for each address.
         // Tradition has it that the prefund list is sorted by address.
-        CStringArray appearances;
-        forEveryPrefund(visitPrefund, &appearances);
+        CStringArray consolidatedLines;
+        forEveryPrefund(visitPrefund, &consolidatedLines);
 
         // Write the chunk and the bloom to the binary cache
         string_q chunkPath = indexFolder_finalized + chunkId + ".bin";
-        if (!writeIndexAsBinary(chunkPath, appearances, (pin ? visitToPin : nullptr), &pinList)) {
+        if (!writeIndexAsBinary(chunkPath, consolidatedLines, (pin ? visitToPin : nullptr), &pinList)) {
             LOG_ERR(cRed, "Failed to write index chunk for block zero.", cOff);
             return false;
         }
+        ostringstream os;
+        os << "Wrote " << consolidatedLines.size() << " records to " << cTeal << relativize(chunkPath) << cOff;
+        LOG_INFO(os.str());
     }
 
     // The previous run may have quit early, leaving the folders in a mild state of
