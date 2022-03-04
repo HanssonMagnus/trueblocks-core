@@ -74,7 +74,8 @@ bool COptions::scrape_blocks(void) {
 
     if (!stage_chunks(tmpStagingFn))
         return false;
-    freshenTimestamps(blaze_start + block_cnt);
+    if (!isTestMode())
+        freshenTimestamps(blaze_start + block_cnt);
     report();
     if (nRecsNow <= apps_per_chunk)
         return true;
