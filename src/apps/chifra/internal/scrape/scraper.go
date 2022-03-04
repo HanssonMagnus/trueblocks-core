@@ -143,20 +143,16 @@ func (opts *ScrapeOptions) RunMonitorScraper(wg *sync.WaitGroup, initialState bo
 					countBefore := mon.Count
 
 					nProcessed++
-					options := " --freshen"
-					options += " " + mon.Address
-					opts.Globals.PassItOn("acctExport", options)
-					options = " --appearances -U --no_header " + mon.Address
+					options := " --appearances -U --no_header " + mon.Address
 					opts.Globals.PassItOn("acctExport", options)
 					in, err := os.Stat(mon.Path)
 					if err != nil {
 						log.Fatal(err)
 					}
-					// fmt.Println(in)
 					mon.Size = uint64(in.Size())
 					mon.Count = mon.Size / 8
 					if countBefore < mon.Count {
-						fmt.Println("\tChanged", mon.Address, mon.Path, mon.Size, mon.Count, (float64(mon.Size) / 8.0))
+						// fmt.Println("\tChanged", mon.Address, mon.Path, mon.Size, mon.Count, (float64(mon.Size) / 8.0))
 						nChanged++
 					}
 				}
