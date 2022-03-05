@@ -55,17 +55,19 @@ bool cleanMonitorFile(const string_q& path, void* data) {
             archiveOut.Release();
 
             static bool first = true;
-            if (!first)
-                cout << ",";
-            first = false;
             size_t sizeNow = m.getRecordCnt(path);
-            cout << "{ ";
-            cout << "\"path\": \"" << substitute(path, m.getPathToMonitor("", false), "$CACHE/") << "\", ";
-            cout << "\"sizeThen\": " << sizeThen << ", ";
-            cout << "\"sizeNow\": " << sizeNow;
-            if (sizeThen > sizeNow)
-                cout << ", \"dupsRemoved\": " << (sizeThen - sizeNow);
-            cout << " }" << endl;
+            if (verbose || sizeThen != sizeNow) {
+                if (!first)
+                    cout << ",";
+                first = false;
+                cout << "{ ";
+                cout << "\"path\": \"" << substitute(path, m.getPathToMonitor("", false), "$CACHE/") << "\", ";
+                cout << "\"sizeThen\": " << sizeThen << ", ";
+                cout << "\"sizeNow\": " << sizeNow;
+                if (sizeThen > sizeNow)
+                    cout << ", \"dupsRemoved\": " << (sizeThen - sizeNow);
+                cout << " }" << endl;
+            }
         }
     }
 

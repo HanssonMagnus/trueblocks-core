@@ -82,7 +82,7 @@ func (opts *ScrapeOptions) RunMonitorScraper(wg *sync.WaitGroup, initialState bo
 					opts.Globals.PassItOn("acctExport", " --freshen "+mon.Address)
 					in, err := os.Stat(mon.Path)
 					if err != nil {
-						log.Fatal(err)
+						log.Println(err)
 					}
 					mon.Size = uint64(in.Size())
 					mon.Count = mon.Size / 8
