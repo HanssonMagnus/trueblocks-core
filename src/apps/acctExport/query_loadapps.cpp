@@ -43,6 +43,13 @@ bool COptions::loadAllAppearances(void) {
                 return false;
             }
 
+            string_q path = monitor.getPathToMonitor(monitor.address, false);
+            if (monitor.getRecordCnt(path) == 0) {
+                // We don't continue if we have no transactions. We used to report an
+                // error, but it's not really an error
+                return false;
+            }
+
             // TODO(tjayrush): This used to set last encountered block (search for writeLastEncountered)
             // if (freshenOnly) {
             //     blknum_t l astExport = monitor.getLastEncounter ed();

@@ -94,7 +94,7 @@ bool copyRipeToStage(const string_q& path, void* data) {
         bool allow = opts->allow_missing;
         bool sequential = (opts->prev_block + 1) == bn;
         bool less_than = (opts->prev_block < bn);
-        if ((!allow && !sequential) || (allow && !less_than)) {
+        if (opts->prev_block != 0 && ((!allow && !sequential) || (allow && !less_than))) {
             LOG_WARN("Current file (", path, ") does not sequentially follow previous file ", opts->prev_block, ".");
             return false;
         }

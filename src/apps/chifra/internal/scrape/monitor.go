@@ -15,3 +15,25 @@ func NewMonitor() Monitor {
 	monitor := new(Monitor)
 	return *monitor
 }
+
+// func (mon *Monitor) Freshen(opts *ScrapeOptions) (uint64, error) {
+// 	i := 0
+// 	fmt.Println("I am here", i)
+// 	i++
+// 	var expOpts exportPkg.ExportOptions
+// 	expOpts.Addrs = append(expOpts.Addrs, mon.Address)
+// 	expOpts.Globals = opts.Globals
+// 	expOpts.Freshen = true
+// 	fmt.Println("I am here", i)
+// 	i++
+// 	opts.Globals.PassItOn("acctExport", expOpts.ToCmdLine())
+// 	fmt.Println("I am here", i, mon.Path)
+// 	i++
+// 	in, err := os.Stat(mon.Path)
+// 	if err != nil {
+// 		log.Println(err)
+// 	}
+// 	mon.Size = uint64(in.Size())
+// 	mon.Count = mon.Size / 8
+// 	return mon.Count, nil
+// }

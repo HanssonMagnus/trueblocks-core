@@ -34,7 +34,7 @@ bool cleanMonitorFile(const string_q& path, void* data) {
 
             m.address = path_2_Addr(path);
             if (!m.loadAppearances(nullptr, nullptr)) {
-                LOG_WARN("Could not open cache file.");
+                LOG_WARN("Could not clean monitor for address ", m.address);
                 return false;
             }
             sort(m.apps.begin(), m.apps.end());

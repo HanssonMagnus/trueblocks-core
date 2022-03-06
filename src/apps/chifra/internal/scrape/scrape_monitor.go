@@ -6,16 +6,8 @@ package scrapePkg
 
 import (
 	"fmt"
-	"log"
 	"os"
-	"path/filepath"
-	"strings"
 	"sync"
-	"time"
-
-	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/colors"
-	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/config"
-	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/rpcClient"
 )
 
 func hasMonitorsFlag(mode string) bool {
@@ -28,9 +20,9 @@ var MonitorScraper Scraper
 func (opts *ScrapeOptions) RunMonitorScraper(wg *sync.WaitGroup, initialState bool) {
 	defer wg.Done()
 
-	chain := opts.Globals.Chain
-	prevChunk := uint64(0)
-	first := true
+	// chain := opts.Globals.Chain
+	// prevChunk := uint64(0)
+	// first := true
 
 	var s *Scraper = &MonitorScraper
 	s.ChangeState(initialState)
@@ -40,63 +32,61 @@ func (opts *ScrapeOptions) RunMonitorScraper(wg *sync.WaitGroup, initialState bo
 			s.Pause()
 
 		} else {
-			var nProcessed uint = 0
-			var nChanged uint = 0
-			thisChunk := rpcClient.GetMetaData(chain, false).Finalized
-			// fmt.Println("first: ", first, " prevChunk: ", prevChunk, " thisChunk: ", thisChunk)
-			if !first && prevChunk == thisChunk {
-				fmt.Println("No new chunks since the last time we ran.")
+			fmt.Println()
+			fmt.Println("Warning: The 'scrape monitors' feature is not currently available")
+			fmt.Println()
+			os.Exit(1)
+			// 	var nProcessed uint = 0
+			// 	var nChanged uint = 0
+			// 	thisChunk := rpcClient.GetMetaData(chain, false).Finalized
+			// 	if !first && prevChunk == thisChunk {
+			// 		logger.Log(logger.Info, "No new chunks since the last time we ran.")
 
-			} else {
-				if !MonitorScraper.Running {
-					break
-				}
-				fmt.Println("Processing")
+			// 	} else {
+			// 		if !MonitorScraper.Running {
+			// 			break
+			// 		}
+			// 		logger.Log(logger.Info, "Processing...")
 
-				var monitors []Monitor
-				root := config.GetPathToCache(chain) + "monitors/"
-				err := filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
-					if strings.Contains(path, ".acct.bin") {
-						parts := strings.Split(strings.Replace(path, ".acct.bin", "", -1), "/")
+			// 		var monitors []Monitor
+			// 		root := config.GetPathToCache(chain) + "monitors/"
+			// 		fmt.Println("Scanning path: ", root)
+			// 		err := filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
+			// 			if strings.Contains(path, ".last.txt") {
+			// 				path = strings.Replace(path, ".last.txt", "", -1)
+			// 				parts := strings.Split(path, "/")
+			// 				var mon Monitor
+			// 				mon.Path = path
+			// 				mon.Address = parts[len(parts)-1]
+			// 				mon.Size = uint64(info.Size())
+			// 				mon.Count = mon.Size / 8
+			// 				monitors = append(monitors, mon)
+			// 				nProcessed++
+			// 			}
+			// 			return nil
+			// 		})
+			// 		if err != nil {
+			// 			panic(err)
+			// 		}
 
-						var mon Monitor
-						mon.Path = path
-						mon.Address = parts[len(parts)-1]
-						mon.Size = uint64(info.Size())
-						mon.Count = mon.Size / 8
-						monitors = append(monitors, mon)
-						nProcessed++
-					}
-					return nil
-				})
-				if err != nil {
-					panic(err)
-				}
-
-				totalBefore := uint64(0)
-				totalAfter := uint64(0)
-				for _, mon := range monitors {
-					countBefore := mon.Count
-					totalBefore += mon.Count
-
-					opts.Globals.PassItOn("acctExport", " --freshen "+mon.Address)
-					in, err := os.Stat(mon.Path)
-					if err != nil {
-						log.Println(err)
-					}
-					mon.Size = uint64(in.Size())
-					mon.Count = mon.Size / 8
-					totalAfter += mon.Count
-					if countBefore < mon.Count {
-						fmt.Println(colors.Red, "\n\tChanged", mon.Address, mon.Path[20:], mon.Size, mon.Count, (float64(mon.Size) / 8.0), colors.Off)
-						nChanged++
-					}
-				}
-			}
-			fmt.Println("\nProcessed: ", nProcessed, " nChanged: ", nChanged, "Sleeping", opts.Sleep, "seconds")
-			time.Sleep(time.Duration(MonitorScraper.SleepSecs) * time.Second)
-			first = false
-			prevChunk = thisChunk
+			// 		totalBefore := uint64(0)
+			// 		totalAfter := uint64(0)
+			// 		for _, mon := range monitors {
+			// 			countBefore := mon.Count
+			// 			countAfter, _ := mon.Freshen(opts)
+			// 			if countBefore < countAfter {
+			// 				opts.Globals.PassItOn("acctExport", "--cache --output txs/"+mon.Address+"_mainnet.txt"+mon.Address)
+			// 				opts.Globals.PassItOn("acctExport", "--cache --chain gnosis --output txs/"+mon.Address+"_gnosis.txt"+mon.Address)
+			// 				nChanged++
+			// 			}
+			// 			totalBefore += countBefore
+			// 			totalAfter += countAfter
+			// 		}
+			// 	}
+			// 	fmt.Println("\nProcessed: ", nProcessed, " nChanged: ", nChanged, "Sleeping", opts.Sleep, "seconds")
+			// 	time.Sleep(time.Duration(MonitorScraper.SleepSecs) * time.Second)
+			// 	first = false
+			// 	prevChunk = thisChunk
 		}
 	}
 }

@@ -578,18 +578,24 @@ bloom_t CMonitor::getBloom(void) {
 blknum_t CMonitor::loadAppearances(MONAPPFUNC func, void* data) {
     string_q path = getPathToMonitor(address, false);
     blknum_t nRecs = this->getRecordCnt(path);
-    if (!nRecs)
-        return false;
+    if (!nRecs) {
+        LOG_WARN("No records found for address ", path_2_Addr(path));
+        // caller needs to test the number of records if they wish to report
+        return true;
+    }
 
     CAppearance_mon* buffer = new CAppearance_mon[nRecs];
-    if (!buffer)
+    if (!buffer) {
+        LOG_ERR("Could not allocate buffer for address ", path_2_Addr(path));
         return false;
+    }
 
     bzero((void*)buffer, nRecs * sizeof(CAppearance_mon));  // NOLINT
     CArchive archiveIn(READING_ARCHIVE);
     if (!archiveIn.Lock(path, modeReadOnly, LOCK_NOWAIT)) {
         archiveIn.Release();
         delete[] buffer;
+        LOG_ERR("Could not lock file ", path_2_Addr(path));
         return false;
     }
     archiveIn.Read(buffer, sizeof(CAppearance_mon), nRecs);
@@ -598,8 +604,10 @@ blknum_t CMonitor::loadAppearances(MONAPPFUNC func, void* data) {
     apps.reserve(apps.size() + nRecs);
     for (size_t i = 0; i < nRecs; i++) {
         apps.push_back(buffer[i]);
-        if (func && !(*func)(buffer[i], data))
+        if (func && !(*func)(buffer[i], data)) {
+            LOG4("forEvery func returns false for address ", path_2_Addr(path));
             return false;
+        }
     }
 
     delete[] buffer;
