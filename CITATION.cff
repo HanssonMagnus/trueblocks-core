@@ -3,6 +3,7 @@ message: "To cite TrueBlocks in publications, please cite it as below:"
 authors:
   - family-names: Thomas Jay
     given-names: Rush
+  - name: TrueBlocks Team
 title: "TrueBlocks: Lightweight indexing for any EVM-based blockchain"
 url: "https://trueblocks.io/"
 date-released: 2022-02-26
